@@ -1,9 +1,16 @@
+version: '3'
+
 services:
   web:
     build: .
-    container_name: ora_web
     command: daphne -b 0.0.0.0 -p 8000 project.asgi:application
     volumes:
       - ./backend:/app
+      - ./frontend:/app/frontend
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
