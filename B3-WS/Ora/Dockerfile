@@ -1,17 +1,17 @@
+# Dockerfile à la racine de Ora/
 FROM python:3.11-slim
-
-# Installer les dépendances système utiles (ex : psycopg2, Pillow, etc.)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copier requirements en premier (meilleur cache Docker)
+# Copier requirements et installer les dépendances
 COPY backend/requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt daphne channels channels_redis
 
 # Copier le backend complet
 COPY backend/ /app/
+
+# Exposer le port
+EXPOSE 8000
+
+# Commande par défaut (peut être surchargée par docker-compose)
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "project.asgi:application"]

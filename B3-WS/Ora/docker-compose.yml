@@ -2,7 +2,6 @@ services:
   web:
     build: .
     container_name: ora_web
-    command: daphne -b 0.0.0.0 -p 8000 project.asgi:application
     volumes:
       - ./backend:/app
       - ./frontend:/app/frontend
