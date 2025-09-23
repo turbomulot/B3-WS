@@ -15,9 +15,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User(username=validated_data["username"], email=validated_data["email"])
         user.set_password(validated_data["password"])
 
-        # Génération clés PGP et ora_id
-        user.generate_pgp_keys()
-        user.generate_ora_id()
+        # Génération PGP et ora_id si tu l'as
+        if hasattr(user, "generate_pgp_keys"):
+            user.generate_pgp_keys()
+        if hasattr(user, "generate_ora_id"):
+            user.generate_ora_id()
 
         user.save()
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "ora_id")
