@@ -1,4 +1,4 @@
-package main
+package mesh
 
 import (
 	"context"
@@ -32,6 +32,20 @@ func (n *Node) SendMessage(msg Message) {
 	if msg.HopCount <= msg.TTL {
 		n.MsgQueue = append(n.MsgQueue, msg)
 	}
+}
+
+func (n *Node) SendMessageWithParams(to string, payload []byte, msgType int) {
+	msg := Message{
+		ID:        fmt.Sprintf("msg-%d", time.Now().UnixNano()),
+		From:      n.Host.ID().String(),
+		To:        to,
+		Type:      MsgType(msgType),
+		Payload:   payload,
+		HopCount:  0,
+		TTL:       5, // Default TTL
+		Timestamp: time.Now().Unix(),
+	}
+	n.SendMessage(msg)
 }
 
 func (n *Node) ReceiveMessage(msg Message) {

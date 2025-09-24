@@ -1,34 +1,27 @@
-package main
+package mesh
 
-import "C"
 import (
-	"context"
-	"fmt"
-	"time"
+    "context"
 )
 
-//export InitNode
+// InitNode crée un nouveau nœud P2P
 func InitNode() *Node {
-	ctx := context.Background()
-	node, _ := NewNode(ctx)
-	node.ProcessQueue()
-	node.StartBLEAdvertising()
-	node.ScanBLENeighbors()
-	node.StartWiFiDirect()
-	return node
+    ctx := context.Background()
+    node, _ := NewNode(ctx)
+    go node.ProcessQueue()
+    return node
 }
 
-//export Send
-func Send(node *Node, to string, payload []byte, typ int) {
-	msg := Message{
-		ID:        fmt.Sprintf("%d", time.Now().UnixNano()),
-		From:      node.Host.ID().String(),
-		To:        to,
-		Type:      MsgType(typ),
-		Payload:   payload,
-		HopCount:  0,
-		TTL:       5,
-		Timestamp: time.Now().Unix(),
-	}
-	node.SendMessage(msg)
+// Wrapper pour envoyer un message
+func (n *Node) SendMessageWrapper(to string, payload []byte, typ int) {
+    n.SendMessageWithParams(to, payload, typ)
+}
+
+// Récupère la liste des pairs connus
+func (n *Node) GetPeerList() []string {
+    peers := []string{}
+    for id := range n.Peers {
+        peers = append(peers, id)
+    }
+    return peers
 }
